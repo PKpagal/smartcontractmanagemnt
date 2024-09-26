@@ -11,7 +11,7 @@ Installation
 Smart Contract
 Clone the repository:
 
-git clone https://github.com/AyushKr2003/ETH-AVAX-PROOF-Smart-Contract-Frontend-Integration.git
+git clone https://github.com/PKpagal/smartcontractmanagemnt/edit/main.git
 cd ETH-AVAX-PROOF-Smart-Contract-Frontend-Integration
 Install Hardhat:
 
