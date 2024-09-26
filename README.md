@@ -1,168 +1,86 @@
+Personal Details Form on Ethereum
+This project is a simple decentralized application (dApp) for storing and retrieving personal details on the Ethereum blockchain. The project includes a smart contract written in Solidity, deployment script using Hardhat, and a React frontend to interact with the smart contract.
 
-# smartcontractmanagemnt
-metacrafter assesment
+Prerequisites
+Before you begin, ensure you have the following installed on your machine:
 
+Node.js
+npm
+MetaMask extension installed in your browser
+Installation
+Smart Contract
+Clone the repository:
 
-Overview
-The Assessment smart contract is a Solidity-based contract designed to manage funds, maintain a leaderboard of participants based on their winnings, and keep a history of user transactions. This contract is built using Solidity version ^0.8.9 and includes functionalities for fund deposits, withdrawals, and tracking of participants' performance.
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+git clone https://github.com/AyushKr2003/ETH-AVAX-PROOF-Smart-Contract-Frontend-Integration.git
+cd ETH-AVAX-PROOF-Smart-Contract-Frontend-Integration
+Install Hardhat:
 
-//import "hardhat/console.sol";
+npm install --save-dev hardhat
+Initialize Hardhat project:
 
-contract Assessment {
-    address payable public owner;
-    uint256 public balance;
+npx hardhat
+Compile the smart contract:
 
-    event Deposit(uint256 amount);
-    event Withdraw(uint256 amount);
+npx hardhat compile
+Deploy the smart contract:
 
-    struct Player {
-        address playerAddress;
-        uint256 winning;
-    }
+npx hardhat run scripts/deploy.js --network localhost
+Frontend
+Install dependencies:
 
-    constructor(uint initBalance) payable {
-        owner = payable(msg.sender);
-        balance = initBalance;
-    }
+npm install
+Start the development server:
 
-    function getBalance() public view returns(uint256){
-        return balance;
-    }
+npm run dev
+Open http://localhost:3007 to view it in your browser.
 
-    function deposit(uint256 _amount) public payable {
-        uint _previousBalance = balance;
+Deployment
+Deploy the contract locally :
+First, start a local Hardhat node in one terminal:
 
-        // make sure this is the owner
-        require(msg.sender == owner, "You are not the owner of this account");
+npx hardhat node
+Then, in another terminal, run the deployment script:
 
-        // perform transaction
-        balance += _amount;
+npx hardhat run --network localhost scripts/deploy.js
+At last, start the frontend application in a new terminal:
 
-        // assert transaction completed successfully
-        assert(balance == _previousBalance + _amount);
+npm run dev
+Open http://localhost:3007 in your browser to view the application.
 
-        // emit the event
-        emit Deposit(_amount);
-    }
+Project Structure
+contracts/: Contains the Solidity smart contract.
+scripts/: Contains the deployment script.
+artifacts/: Generated artifacts after contract compilation.
+pages/: Contains the React frontend code.
+Interacting with the dApp
+Connect Wallet
+Click on the Connect Metamask button to connect your Metamask wallet to the dApp.
 
-    // custom error
-    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+Set Details
+Fill in your name, age, and post in the input fields. Click the Set Details button to store your details on the blockchain.
 
-    function withdraw(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner of this account");
-        uint _previousBalance = balance;
-        if (balance < _withdrawAmount) {
-            revert InsufficientBalance({
-                balance: balance,
-                withdrawAmount: _withdrawAmount
-            });
-        }
+Get Details
+Click the Get Details button to retrieve your details from the blockchain.
 
-        // withdraw the given amount
-        balance -= _withdrawAmount;
+Get Details by Address
+Enter an account address in the Address input field. Click the "Get Details by address" button to retrieve the details stored under that address (only accessible by the contract owner).
 
-        // assert the balance is correct
-        assert(balance == (_previousBalance - _withdrawAmount));
+Clear Details
+Click the Clear Details button to clear the displayed details.
 
-        // emit the event
-        emit Withdraw(_withdrawAmount);
-    }
+Smart Contract
+The smart contract is written in Solidity and provides the following functionalities:
 
-    // Leaderboard
-    mapping (address => uint) moneyWon;
-    Player[] public leaderboard;
+Set personal details (name, age, post) for the user.
+Get personal details of the user.
+Get personal details of any user by the contract owner.
+Frontend
+The frontend is built using React and Ethers.js. It interacts with the deployed smart contract and provides a user interface for users to set and retrieve their personal details.
 
-    function addToLeaderBoard(address _address, uint amountWon) public {
-        moneyWon[_address]+=amountWon;
-
-        bool alreadyExist = false;
-        for(uint i=0;i<leaderboard.length;i++){
-            if(leaderboard[i].playerAddress==_address){
-                leaderboard[i].winning = moneyWon[_address];
-                alreadyExist = true;
-                break;
-            }
-        }
-
-        if(!alreadyExist) {
-            leaderboard.push(Player(_address,moneyWon[_address]));
-        }
-    }
-    function getLeaderboard() public view returns (Player[] memory) {
-        return leaderboard;
-    }
-
-    // History
-    struct Transaction {
-        address user;
-        string resultType;
-        uint256 timestamp;
-    }
-    mapping(address => Transaction[]) public history;
-
-     function addToHistory(address _user, string memory _type) public {
-        history[_user].push(Transaction({
-            user: _user,
-            resultType:_type,
-            timestamp: block.timestamp
-        }));
-        
-    }
-
-    function getHistory(address _user) public view returns (Transaction[] memory) {
-        return history[_user];
-    }
-}
-Features
-Contract Owner: The contract is owned by a single address, which has exclusive rights to deposit and withdraw funds.
-Fund Management:
-Deposit Funds: Only the contract owner can deposit funds into the contract.
-Withdraw Funds: Only the contract owner can withdraw funds from the contract.
-Leaderboard:
-Tracks participants' winnings.
-Allows adding participants and updating their winnings.
-Retrieves the leaderboard.
-Transaction History:
-Records user transactions with outcomes and timestamps.
-Retrieves a user's transaction history.
-Contract Details
-State Variables
-address payable public contractOwner: The address of the contract owner.
-uint256 public contractBalance: The balance of the contract.
-mapping(address => uint256) public winningsRecord: Tracks each participant's winnings.
-Participant[] public leaderboard: List of participants and their total winnings.
-mapping(address => UserTransaction[]) public transactionHistory: Stores transaction history for each user.
-Structs
-Participant: Contains an address and total winnings.
-UserTransaction: Contains user address, transaction outcome, and timestamp.
-Events
-FundsDeposited(uint256 amount): Emitted when funds are deposited.
-FundsWithdrawn(uint256 amount): Emitted when funds are withdrawn.
-Functions
-constructor(uint initialBalance): Initializes the contract with an initial balance and sets the owner.
-getContractBalance(): Returns the current balance of the contract.
-depositFunds(uint256 _amount): Allows the owner to deposit funds.
-withdrawFunds(uint256 _withdrawAmount): Allows the owner to withdraw funds.
-addToLeaderboard(address _address, uint256 amountWon): Adds or updates a participant in the leaderboard.
-getLeaderboard(): Retrieves the current leaderboard.
-addToTransactionHistory(address _user, string memory _outcome): Adds a transaction record for a user.
-getTransactionHistory(address _user): Retrieves the transaction history for a user.
-Error Handling
-InsufficientFunds: Custom error for insufficient funds during withdrawal.
-Usage
-Deployment: Deploy the contract with an initial balance using the constructor.
-Deposit Funds: The contract owner can deposit funds using the depositFunds function.
-Withdraw Funds: The contract owner can withdraw funds using the withdrawFunds function.
-Manage Leaderboard: Add participants and update their winnings using addToLeaderboard. Retrieve the leaderboard with getLeaderboard.
-Track Transactions: Record transactions with addToTransactionHistory and view them with getTransactionHistory.
-Contributing
-Contributions are welcome! Please feel free to fork the repository and submit a pull request with improvements or bug fixes.
+#author
+Prince Kumar
+kumarprincerajput124@gmail.com
 
 License
-This project is licensed under the UNLICENSED License.
+This project is licensed under the MIT License.
 
-Contact
-For any questions or further information, please contact [Name:Prince Kumar
-Email:kumarprincerajput124@gmail.com.]
